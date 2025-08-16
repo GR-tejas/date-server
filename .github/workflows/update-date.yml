@@ -2,8 +2,11 @@ name: Update date.json
 
 on:
   schedule:
-    - cron: "0 0 * * *"  # Runs every day at 00:00 UTC
-  workflow_dispatch:     # allows manual trigger
+    - cron: "0 0 * * *"   # once per day at midnight UTC
+  workflow_dispatch:       # manual run button
+
+permissions:
+  contents: write   # ✅ allow commit & push
 
 jobs:
   update-date:
@@ -23,11 +26,12 @@ jobs:
             \"second\": %S
           }")
           echo "$DATE_JSON" > date.json
+          cat date.json   # ✅ print for debug
 
       - name: Commit and push
         run: |
           git config user.name "github-actions"
           git config user.email "actions@github.com"
           git add date.json
-          git commit -m "Update date.json"
+          git diff --cached --quiet || git commit -m "Update date.json"
           git push

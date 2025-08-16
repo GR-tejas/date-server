@@ -1,0 +1,33 @@
+name: Update date.json
+
+on:
+  schedule:
+    - cron: "0 0 * * *"  # Runs every day at 00:00 UTC
+  workflow_dispatch:     # allows manual trigger
+
+jobs:
+  update-date:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Generate UTC Date
+        run: |
+          DATE_JSON=$(date -u +"{
+            \"year\": %Y,
+            \"month\": %m,
+            \"day\": %d,
+            \"hour\": %H,
+            \"minute\": %M,
+            \"second\": %S
+          }")
+          echo "$DATE_JSON" > date.json
+
+      - name: Commit and push
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add date.json
+          git commit -m "Update date.json"
+          git push
